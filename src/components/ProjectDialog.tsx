@@ -76,9 +76,20 @@ function RailButton({ direction, disabled, onClick }: RailButtonProps) {
 interface ScreenshotsProps {
   title: string;
   shots: ProjectShot[];
+  /** 'portrait' (phone app, default) sizes a narrow tall rail item; 'landscape' (desktop/web) sizes a wide short one. */
+  orientation?: 'portrait' | 'landscape';
 }
 
-function Screenshots({ title, shots }: ScreenshotsProps) {
+const railItemClass: Record<'portrait' | 'landscape', string> = {
+  portrait: 'w-[13.5rem] sm:w-[15.5rem]',
+  landscape: 'w-[19rem] sm:w-[26rem]',
+};
+const railImageClass: Record<'portrait' | 'landscape', string> = {
+  portrait: 'aspect-[625/1350]',
+  landscape: 'aspect-[2/1]',
+};
+
+function Screenshots({ title, shots, orientation = 'portrait' }: ScreenshotsProps) {
   const railRef = useRef<HTMLUListElement>(null);
   const [atStart, setAtStart] = useState<boolean>(true);
   const [atEnd, setAtEnd] = useState<boolean>(false);
@@ -120,7 +131,10 @@ function Screenshots({ title, shots }: ScreenshotsProps) {
         className="-mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain px-5 pb-4 [scrollbar-color:rgb(255_255_255/0.18)_transparent] [scrollbar-width:thin] sm:-mx-10 sm:px-10"
       >
         {shots.map((shot) => (
-          <li key={shot.src} className="w-[13.5rem] shrink-0 snap-start scroll-ml-5 sm:w-[15.5rem] sm:scroll-ml-10">
+          <li
+            key={shot.src}
+            className={`shrink-0 snap-start scroll-ml-5 sm:scroll-ml-10 ${railItemClass[orientation]}`}
+          >
             <figure>
               <div className="relative overflow-hidden rounded-[1.6rem] bg-ink-950 shadow-card">
                 <img
@@ -129,7 +143,7 @@ function Screenshots({ title, shots }: ScreenshotsProps) {
                   loading="lazy"
                   decoding="async"
                   draggable={false}
-                  className="aspect-[625/1350] w-full object-cover"
+                  className={`w-full object-cover ${railImageClass[orientation]}`}
                 />
                 <div aria-hidden className="pointer-events-none absolute inset-0 bg-linear-to-t from-ink-950/35 via-transparent to-transparent" />
                 <div aria-hidden className="pointer-events-none absolute inset-0 rounded-[1.6rem] ring-1 ring-inset ring-white/15" />
@@ -286,7 +300,9 @@ export default function ProjectDialog({ project, position, total, previous, next
           ) : null}
 
           {/* ── screenshots ── */}
-          {shots.length > 0 ? <Screenshots title={project.title} shots={shots} /> : null}
+          {shots.length > 0 ? (
+            <Screenshots title={project.title} shots={shots} orientation={project.screenshotOrientation} />
+          ) : null}
 
           {/* ── what I built ── */}
           <Block label="What I built">

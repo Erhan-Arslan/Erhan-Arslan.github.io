@@ -101,6 +101,8 @@ export interface ProjectItem {
   links?: ProjectLink[];
   icon: LucideIcon;
   featured?: boolean;
+  /** Shape of the screenshots in the dialog's rail — 'portrait' (phone app, default) or 'landscape' (desktop/web). */
+  screenshotOrientation?: 'portrait' | 'landscape';
 }
 
 export interface SkillGroup {
@@ -486,6 +488,7 @@ export const projects: ProjectItem[] = [
       },
     ],
     icon: LineChart,
+    screenshotOrientation: 'landscape',
   },
 ];
 
