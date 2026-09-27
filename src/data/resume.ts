@@ -6,9 +6,12 @@ import {
   Database,
   Droplets,
   Fingerprint,
+  GitBranch,
   Glasses,
   Languages,
+  LayoutDashboard,
   LayoutTemplate,
+  LineChart,
   Lock,
   Mail,
   Navigation,
@@ -408,6 +411,81 @@ export const projects: ProjectItem[] = [
       },
     ],
     icon: Droplets,
+  },
+  {
+    id: 'stock-forecasting',
+    title: 'Stock Price Forecasting',
+    platform: 'Machine Learning project',
+    summary:
+      'A PyTorch time-series project comparing LSTM and GRU networks — and a naive baseline — for next-day stock price forecasting.',
+    bullets: [
+      'Built PyTorch LSTM and GRU regressors for one-step-ahead, next-day closing-price forecasting, benchmarked against a naive last-value baseline.',
+      'Prevented data leakage with chronological (non-random) train/validation/test splits and a scaler fit only on the training prices.',
+      'Built a local, real-time Chart.js dashboard to launch experiments, stream logs, and compare model metrics and predictions interactively.',
+      'Added pytest coverage, ruff linting, a GitHub Actions CI workflow, and a runnable Jupyter notebook with an offline fast mode.',
+    ],
+    stack: ['PyTorch', 'Python', 'scikit-learn', 'yfinance'],
+    libraries: ['Chart.js', 'pytest', 'ruff', 'GitHub Actions', 'Jupyter'],
+    caseStudy: {
+      problem:
+        'Portfolio time-series projects often leak future information into training — through random splits or scaling on the full series — and skip comparing against a real baseline, which makes results look more meaningful than they are.',
+      approach:
+        'Built a leakage-safe pipeline with chronological splits and train-only scaling, then trained a PyTorch LSTM and GRU on real AMZN daily closing prices (2010–2025), benchmarking both against a naive last-value baseline across RMSE, MAE, MAPE, R², and directional accuracy.',
+      result:
+        "On raw closing prices, both neural models actually scored worse than the naive baseline (test RMSE: naive 3.75 vs. LSTM 20.26 vs. GRU 13.51), with directional accuracy near chance. Switching the target to a log-return removed the \"copy yesterday's price\" shortcut and let both models edge past the baseline for the first time, with directional accuracy rising to about 53%.",
+    },
+    metrics: [
+      { value: '3', label: 'Models compared: LSTM, GRU, and a naive baseline' },
+      { value: '2010–2025', label: 'Years of real AMZN daily closing prices used' },
+      { value: '~53%', label: 'Directional accuracy after switching to a log-return target' },
+      { value: '0', label: 'Leakage — scaler fit only on the training split' },
+    ],
+    challenges: [
+      {
+        title: 'Data leakage in time-series splits',
+        challenge:
+          'Randomly splitting time-series data, or fitting the scaler on the full series, leaks future information into training and makes results look better than they really are.',
+        solution:
+          'Used chronological, non-random train/validation/test splits and fit the scaler only on the training prices before transforming the rest of the series.',
+      },
+      {
+        title: 'Neural networks losing to a naive baseline',
+        challenge:
+          "Trained on raw closing prices, both the LSTM and GRU scored worse than a naive \"tomorrow equals today\" baseline, and directional accuracy stayed near chance.",
+        solution:
+          'Diagnosed the cause — daily prices are highly autocorrelated, so the models were mostly learning to copy the last value — and added a log-return target transform, which removed that shortcut and let both models edge past the baseline.',
+      },
+      {
+        title: 'Making the pipeline reproducible & trustworthy',
+        challenge: 'Beginner ML portfolio projects are easy to run once and hard to trust or reproduce.',
+        solution:
+          'Added automated tests for sequence alignment, split integrity, metrics and the smoke pipeline, a lint step, a CI workflow, deterministic offline demo data, and a local dashboard for inspecting every run.',
+      },
+    ],
+    links: [{ label: 'Source on GitHub', href: 'https://github.com/Erhan-Arslan/stock-price-forecasting-pytorch' }],
+    architecture: [
+      {
+        title: 'Chronological data split',
+        detail: 'Train/validation/test windows are split by date, never randomly, with the scaler fit only on training prices.',
+        icon: GitBranch,
+      },
+      {
+        title: 'LSTM & GRU training',
+        detail: 'PyTorch LSTM and GRU regressors are trained under matching conditions and checkpointed on validation loss.',
+        icon: BrainCircuit,
+      },
+      {
+        title: 'Baseline benchmarking',
+        detail: 'Both models are benchmarked against a naive last-value baseline using RMSE, MAE, MAPE, R², and directional accuracy.',
+        icon: Scale,
+      },
+      {
+        title: 'Interactive dashboard',
+        detail: 'A local Chart.js dashboard runs experiments, streams logs, and visualizes metrics and predictions for every run.',
+        icon: LayoutDashboard,
+      },
+    ],
+    icon: LineChart,
   },
 ];
 
