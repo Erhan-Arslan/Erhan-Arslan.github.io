@@ -1,4 +1,5 @@
 import {
+  Activity,
   BrainCircuit,
   Cable,
   CodeXml,
@@ -8,12 +9,14 @@ import {
   Fingerprint,
   GitBranch,
   Glasses,
+  KanbanSquare,
   Languages,
   LayoutDashboard,
   LayoutTemplate,
   LineChart,
   Lock,
   Mail,
+  MessageSquare,
   Navigation,
   Phone,
   QrCode,
@@ -21,6 +24,7 @@ import {
   Scale,
   ShieldCheck,
   Smartphone,
+  TestTube,
   Wrench,
   type LucideIcon,
 } from 'lucide-react';
@@ -488,6 +492,86 @@ export const projects: ProjectItem[] = [
       },
     ],
     icon: LineChart,
+    screenshotOrientation: 'landscape',
+  },
+  {
+    id: 'devflow-ai',
+    title: 'DevFlow AI',
+    platform: 'Web app',
+    summary:
+      'An AI-powered Kanban board managed through natural language, with a "propose, human approves" architecture and a one-click risk report.',
+    bullets: [
+      "Built a natural-language Kanban board where commands like \"add an urgent login bug for Ali, due Friday\" or \"reassign Ayşe's overdue tasks to Ali\" are parsed into board changes.",
+      'Designed a "propose, human approves" architecture — every AI suggestion is reviewed and selectively approved before anything reaches the database.',
+      'Built a one-click AI risk report that analyzes delays, bottlenecks and per-person workload and streams live over SSE.',
+      'Covered the project with 92 unit/integration tests and 8 Playwright end-to-end tests, running automatically in CI on every change.',
+    ],
+    stack: ['React', 'TypeScript', 'Tailwind CSS', 'Node.js', 'Express'],
+    libraries: ['SQLite (Drizzle ORM)', 'Claude API', 'Vitest', 'Playwright', 'GitHub Actions', 'Docker'],
+    role: 'Full-Stack & AI Integration',
+    roleSummary:
+      'Built the project end to end, solo — the UI/UX design, the React + TypeScript frontend, the Express + SQLite backend, the Claude API integration, and the test and CI/CD infrastructure.',
+    caseStudy: {
+      problem:
+        "Jira-style tools require filling out a long form for every task, and seeing who's falling behind or overloaded takes manual tracking — wasting time and letting risks slip through unnoticed.",
+      approach:
+        "Built a Kanban board managed through natural language: commands such as \"add an urgent login bug for Ali, due Friday\" or \"reassign Ayşe's overdue tasks to Ali\" are parsed by a Claude-based agent, which searches the board and proposes changes for the user to selectively approve. A one-click risk report analyzes delays, bottlenecks and per-person workload. Drag-and-drop, team/profile management, filters and task history round out the board.",
+      result:
+        "No AI output reaches the database without approval, and the agent's accuracy is measured directly: 24/24 on the task-parsing eval set and 14/14 on the board-agent eval set. The project is covered by 92 unit/integration tests and 8 Playwright end-to-end tests, runs CI on every change via GitHub Actions, and ships as a single Docker image.",
+    },
+    metrics: [
+      { value: '24/24', label: 'Task-parsing eval accuracy' },
+      { value: '14/14', label: 'Board-agent eval accuracy' },
+      { value: '100', label: 'Unit, integration and end-to-end tests (92 + 8)' },
+      { value: '0', label: 'AI writes to the database without human approval' },
+    ],
+    challenges: [
+      {
+        title: 'Letting AI change data safely',
+        challenge:
+          'Letting a language model write directly to the database risked a misread command silently deleting or corrupting tasks.',
+        solution:
+          'Built the agent around a "propose, human approves" architecture — every suggestion is shown against the current list, and nothing is written until the user selects and approves it.',
+      },
+      {
+        title: 'Turkish relative dates',
+        challenge:
+          'Correctly interpreting Turkish date phrases like "haftaya cuma" (next Friday) or "gelecek hafta" (next week) was difficult — models are especially error-prone at day-of-week arithmetic.',
+        solution:
+          'Added a dedicated date-resolution step so the model never computes the arithmetic itself, and built an eval set from real, prompt-injection-laced scenarios to measure the fix.',
+      },
+      {
+        title: 'Accurate numbers and fast feedback in reports',
+        challenge:
+          'Letting the model compute report figures itself risked wrong metrics, and waiting for the whole report to finish felt slow.',
+        solution:
+          'Computed every metric (overdue counts, workload, priority breakdown) deterministically and gave Claude only the summary to narrate; the report streams live over SSE, and closing the panel cancels the in-flight request to avoid wasted cost.',
+      },
+    ],
+    links: [{ label: 'Source on GitHub', href: 'https://github.com/Erhan-Arslan/devflow-ai' }],
+    architecture: [
+      {
+        title: 'Natural-language commands',
+        detail: 'Free-text commands — creating or reassigning tasks — are parsed by a Claude-based agent into structured board actions.',
+        icon: MessageSquare,
+      },
+      {
+        title: 'Propose, human approves',
+        detail: 'Every AI suggestion is shown for review; nothing reaches the database until the user selects and approves it.',
+        icon: ShieldCheck,
+      },
+      {
+        title: 'Deterministic risk report',
+        detail: 'Delay, bottleneck and workload metrics are computed deterministically, then streamed live over SSE as Claude narrates them.',
+        icon: Activity,
+      },
+      {
+        title: 'Tested & shipped',
+        detail: '92 unit/integration tests plus 8 Playwright E2E tests run in GitHub Actions CI; the app ships as a single Docker image.',
+        icon: TestTube,
+      },
+    ],
+    icon: KanbanSquare,
     screenshotOrientation: 'landscape',
   },
 ];
