@@ -16,6 +16,10 @@ concurrency:
 
 jobs:
   build:
+    # This workflow file is also pushed to the erhan-arslan-cv source repo (kept in sync with this
+    # one on purpose). Pages is only enabled on Erhan-Arslan.github.io, so skip there instead of
+    # failing the check.
+    if: github.repository == 'Erhan-Arslan/Erhan-Arslan.github.io'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -30,6 +34,7 @@ jobs:
           path: dist
 
   deploy:
+    if: github.repository == 'Erhan-Arslan/Erhan-Arslan.github.io'
     needs: build
     runs-on: ubuntu-latest
     environment:
