@@ -1,6 +1,5 @@
 import {
   Activity,
-  Bell,
   BrainCircuit,
   CodeXml,
   Component,
@@ -21,6 +20,8 @@ import {
   Navigation,
   Phone,
   QrCode,
+  RefreshCw,
+  Rocket,
   Scale,
   Server,
   ShieldCheck,
@@ -316,27 +317,95 @@ export const projects: ProjectItem[] = [
       'Automated order e-mails via the Brevo API; containerized with Docker, with CI via GitHub Actions.',
     ],
     stack: ['React', 'TypeScript', 'NestJS', 'ASP.NET Core', 'PostgreSQL'],
-    libraries: ['Prisma', 'SignalR', 'QuestPDF', 'JWT', 'Brevo API', 'Docker', 'GitHub Actions'],
+    libraries: [
+      'Vite',
+      'Tailwind CSS',
+      'Prisma',
+      'SignalR',
+      'QuestPDF',
+      'JWT',
+      'Brevo API',
+      'xUnit',
+      'Docker',
+      'GitHub Actions',
+      'Render',
+      'Neon',
+    ],
+    role: 'Full-Stack Developer (Solo)',
+    roleSummary:
+      'Built the project end to end as the sole developer — the architecture (splitting responsibilities between the NestJS backend and the .NET microservice), the database model, the frontend, both backend APIs, and testing, CI/CD, deployment and production debugging.',
+    caseStudy: {
+      problem:
+        "Selling eyewear online is harder than ordinary e-commerce: a customer's prescription (SPH, CYL, AXIS, PD) has to be captured correctly and the right lens recommended for it, pricing depends on frame, lens type, coating and lens index, and the store needs to see new orders instantly, issue an invoice, and e-mail the customer at every stage.",
+      approach:
+        "A React 19/TypeScript/Vite/Tailwind CSS frontend — catalog, product pages, cart, prescription-based checkout, customer account and admin panel — talks to a NestJS + Prisma REST API on PostgreSQL with JWT access/refresh authentication, role-based authorization, rate limiting and structured logging. A separate C#/ASP.NET Core microservice, validating the same JWTs with read-only database access, handles prescription analysis and lens-index recommendation, real-time admin notifications over SignalR, QuestPDF invoices and Brevo e-mails. The two services communicate through a Transactional Outbox Pattern — each event is saved in the same database transaction as the order and retried with exponential backoff, with duplicates dropped on arrival — and ship via Docker and GitHub Actions CI/CD, with the frontend on GitHub Pages, the services on Render, and the database on Neon PostgreSQL.",
+      result:
+        'A live, end-to-end order flow — product selection, prescription entry, payment, instant admin notification, PDF invoice, and a customer e-mail on every status change — backed by 65 xUnit tests on the .NET side plus unit and e2e tests for NestJS, with a CI/CD pipeline that runs the tests and deploys automatically on every push.',
+    },
+    metrics: [
+      { value: '65', label: 'xUnit tests on the .NET microservice' },
+      { value: '2', label: 'Backend services sharing one JWT auth system' },
+      { value: '5', label: 'Production incidents diagnosed and fixed' },
+      { value: '0', label: 'Lost or duplicate notification e-mails' },
+    ],
+    challenges: [
+      {
+        title: 'E-mails lost to a sleeping service',
+        challenge:
+          'On the free hosting tier, the .NET service went to sleep after 15 idle minutes; the one-shot request sent right after checkout timed out, and the "order received" e-mail was silently lost.',
+        solution:
+          'Traced it through the Brevo and server logs, then fixed it with the Transactional Outbox Pattern — notifications can now be delayed, but are never lost.',
+      },
+      {
+        title: 'Blocked SMTP ports',
+        challenge: "The hosting provider blocks outbound SMTP, so e-mails couldn't be sent at all.",
+        solution:
+          "Moved sending to Brevo's HTTPS API and added a resilience handler that automatically retries transient failures.",
+      },
+      {
+        title: 'Shared authentication across two backends',
+        challenge: 'The .NET service had to validate JWTs issued by NestJS.',
+        solution:
+          'Set up a shared signing key and a common claim structure; internal service-to-service calls are protected with a separate API key compared in constant time to prevent timing attacks.',
+      },
+      {
+        title: 'Database migration under a connection pooler',
+        challenge:
+          "The free Postgres instance gets suspended after 30 days, so the database had to move to Neon — but Neon's connection pooler couldn't take the migration lock.",
+        solution: 'Ran migrations over a direct connection that bypasses the pooler.',
+      },
+      {
+        title: 'A performance bug in EF Core',
+        challenge: 'EF Core was building a new internal service provider on every request.',
+        solution: 'Found the cause and fixed the configuration.',
+      },
+    ],
+    links: [{ label: 'Source on GitHub', href: 'https://github.com/Erhan-Arslan/ars-optik-ve-lens' }],
     architecture: [
       {
         title: 'React storefront',
-        detail: 'A React/TypeScript frontend for browsing and ordering prescription lenses.',
+        detail: 'A React 19 + TypeScript + Vite frontend: catalog, prescription-based checkout, customer account and admin panel.',
         icon: Component,
       },
       {
         title: 'NestJS + Prisma API',
-        detail: 'A NestJS REST API with Prisma handles data and JWT authentication on PostgreSQL.',
+        detail: 'A NestJS REST API on PostgreSQL with JWT access/refresh auth, role-based authorization, rate limiting and structured logging.',
         icon: Database,
       },
       {
         title: 'ASP.NET Core microservice',
-        detail: 'A C#/ASP.NET Core microservice analyzes prescriptions and recommends lenses.',
+        detail: 'A C#/ASP.NET Core service — validating the same JWTs — handles prescription analysis, lens-index recommendation, SignalR notifications, QuestPDF invoices and Brevo e-mails.',
         icon: Cpu,
       },
       {
-        title: 'Notifications, invoices & CI',
-        detail: 'SignalR notifies admins in real time, QuestPDF generates invoices, and Docker + GitHub Actions ship it.',
-        icon: Bell,
+        title: 'Transactional outbox',
+        detail: 'Events between the two services are saved in the same DB transaction as the order and retried with exponential backoff; duplicates are dropped on arrival.',
+        icon: RefreshCw,
+      },
+      {
+        title: 'Docker, CI/CD & hosting',
+        detail: 'Docker + GitHub Actions ship it: frontend on GitHub Pages, services on Render, database on Neon PostgreSQL.',
+        icon: Rocket,
       },
     ],
     icon: Glasses,
