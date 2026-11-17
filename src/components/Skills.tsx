@@ -5,15 +5,17 @@ type Tone = 'electric' | 'lagoon' | 'azure' | 'saffron';
 
 const groupTone: Record<string, Tone> = {
   frontend: 'electric',
+  backend: 'azure',
   mobile: 'lagoon',
-  ai: 'azure',
-  tools: 'electric',
+  ai: 'electric',
+  tools: 'lagoon',
   languages: 'saffron',
 };
 
 const groupSpan: Record<string, string> = {
-  frontend: 'lg:col-span-3',
-  mobile: 'lg:col-span-3',
+  frontend: 'lg:col-span-2',
+  backend: 'lg:col-span-2',
+  mobile: 'lg:col-span-2',
   ai: 'lg:col-span-2',
   tools: 'lg:col-span-2',
   languages: 'lg:col-span-2',

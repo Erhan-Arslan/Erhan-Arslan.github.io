@@ -2,7 +2,7 @@ import { Award, GraduationCap, MapPin } from 'lucide-react';
 import { education, profile } from '../data/resume';
 import { IconTile, Reveal, SectionHeading } from './ui';
 
-const HIGHLIGHT = /(React Native|React|TypeScript|Front-End, Web, and Mobile Development)/g;
+const HIGHLIGHT = /(React Native|React|TypeScript|ASP\.NET Core|Full-Stack Web and Mobile Development)/g;
 
 function highlight(text: string) {
   return text.split(HIGHLIGHT).map((part, index) =>
