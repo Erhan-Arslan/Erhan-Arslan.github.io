@@ -409,6 +409,7 @@ export const projects: ProjectItem[] = [
       },
     ],
     icon: Glasses,
+    screenshotOrientation: 'landscape',
   },
   {
     id: 'blood-donation',
